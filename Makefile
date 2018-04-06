@@ -1,6 +1,11 @@
 ROOT_DIR := $(shell pwd)
 KERNEL_DIR := ${ROOT_DIR}/kernel-source
 
+.PHONY: kernel_uimage
+kernel_uimage:
+	make -j4 -C ${KERNEL_DIR} UIMAGE_LOADADDR=0x2080000 uImage  ARCH=arm
+	cp -p ${KERNEL_DIR}/arch/arm/boot/uImage images/
+
 .PHONY: kernel_zimage
 kernel_zimage:
 	make -j4 -C ${KERNEL_DIR} zImage
@@ -26,7 +31,15 @@ kernel_modules_install:
 
 .PHONY: kernel_xconfig
 kernel_xconfig:
-	make -C ${KERNEL_DIR} xconfig
+	make -C ${KERNEL_DIR} xconfig ARCH=arm
+
+.PHONY: kernel_menuconfig
+kernel_menuconfig:
+	make -C ${KERNEL_DIR} menuconfig ARCH=arm
+
+.PHONY: kernel_save_config
+kernel_save_config:
+	cp -p ${KERNEL_DIR}/.config config/kernel_config
 
 .PHONY: kernel_mrproper
 kernel_mrproper:
